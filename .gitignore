@@ -1,0 +1,51 @@
+# Environment variables
+.env
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# PDFs and uploaded documents
+*.pdf
+uploaded_docs/
+temp_uploads/
+
+# OCR installer
+tesseract-installer.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Documentation backups
+*_backup.md
+
+# Markdown files
+*.md

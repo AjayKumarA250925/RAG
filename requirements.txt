@@ -1,0 +1,15 @@
+streamlit==1.39.0
+langchain==0.3.13
+langchain-openai==0.2.14
+langchain-pinecone==0.2.0
+langchain-community==0.3.13
+pinecone-client==5.0.1
+python-dotenv==1.0.0
+pypdf==4.3.1
+python-docx==1.1.2
+docx2txt==0.8
+rank-bm25==0.2.2
+# OCR Support for scanned PDFs (PyMuPDF-based, no Poppler needed)
+pytesseract==0.3.10
+Pillow==10.4.0
+pymupdf==1.24.13
