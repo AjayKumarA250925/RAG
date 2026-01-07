@@ -30,13 +30,13 @@ except ImportError:
 class DocumentProcessor:
     """Handles document loading and processing for RAG application with OCR support."""
 
-    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200, use_ocr: bool = True):
+    def __init__(self, chunk_size: int = 1500, chunk_overlap: int = 300, use_ocr: bool = True):
         """
         Initialize the document processor with optimized SENTENCE-BASED chunking.
 
         Args:
-            chunk_size: Size of text chunks for splitting (reduced to 1000 for better sentence boundaries)
-            chunk_overlap: Overlap between chunks (reduced to 200 for efficiency)
+            chunk_size: Size of text chunks for splitting (1500 for better context, like Kernel Memory)
+            chunk_overlap: Overlap between chunks (300 for continuity, similar to reference app)
             use_ocr: Whether to use OCR ONLY for actual image-based PDFs (default: TRUE, auto-detects)
         """
         self.chunk_size = chunk_size
@@ -266,6 +266,22 @@ class DocumentProcessor:
         # Split documents into chunks while preserving metadata
         chunks = self.text_splitter.split_documents(all_documents)
 
+        # DEDUPLICATION: Remove duplicate chunks (like reference app does)
+        seen_content = set()
+        unique_chunks = []
+        duplicate_count = 0
+
+        for chunk in chunks:
+            # Create a hash of the content (first 100 chars as identifier)
+            content_id = chunk.page_content[:100] if len(chunk.page_content) > 100 else chunk.page_content
+            content_hash = hash(content_id)
+
+            if content_hash not in seen_content:
+                seen_content.add(content_hash)
+                unique_chunks.append(chunk)
+            else:
+                duplicate_count += 1
+
         print(f"\n{'='*60}")
         print(f"📊 PROCESSING SUMMARY")
         print(f"{'='*60}")
@@ -274,7 +290,9 @@ class DocumentProcessor:
         print(f"  • Failed: {failed}")
         print(f"  • Total pages extracted: {len(all_documents)}")
         print(f"  • Total chunks created: {len(chunks)}")
-        print(f"  • Average chunks per document: {len(chunks) / successful if successful else 0:.1f}")
+        print(f"  • Duplicate chunks removed: {duplicate_count}")
+        print(f"  • Unique chunks: {len(unique_chunks)}")
+        print(f"  • Average chunks per document: {len(unique_chunks) / successful if successful else 0:.1f}")
 
         if failed_files:
             print(f"\n❌ Failed files ({len(failed_files)}):")
@@ -285,7 +303,7 @@ class DocumentProcessor:
 
         print(f"{'='*60}\n")
 
-        return chunks
+        return unique_chunks  # Return deduplicated chunks
 
     def process_text(self, text: str):
         """

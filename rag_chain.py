@@ -113,6 +113,19 @@ CRITICAL INSTRUCTIONS:
 
 10. CERTAINTY: Only say information is not available if you've thoroughly checked ALL context and found NOTHING related.
 
+11. **NAME VARIATIONS - CONSISTENCY REQUIRED**:
+   - Same person may have multiple names: "Balarama" = "Baladeva", "Krishna" = "Vasudeva"
+   - When answering, use the name that appears MOST in the context
+   - If context mentions multiple variations, acknowledge them: "Balarama (also known as Baladeva)"
+   - CRITICAL: Give consistent answer regardless of which name variation user asks about
+
+12. **FAMILY RELATIONSHIPS - NO INCONSISTENCY**:
+   - When asked about someone's grandparents/parents/children multiple times
+   - YOU MUST give the EXACT SAME ANSWER every time
+   - Check ALL chunks for family relationships before answering
+   - If you find conflicting information in chunks, state: "The sources contain conflicting information..."
+   - NEVER give different family members in different responses for the same person
+
 Context:
 {context}
 
@@ -233,15 +246,36 @@ Detailed Answer:"""
 
     def _preprocess_query(self, question: str) -> str:
         """
-        Preprocess the query to improve retrieval for specific question types.
+        Preprocess the query to improve retrieval with synonym expansion.
 
         Args:
             question: Original question
 
         Returns:
-            Enhanced query string
+            Enhanced query string with synonyms
         """
         import re
+
+        # Mahabharata-specific name variations (expand query with all variations)
+        name_expansions = {
+            'balarama': 'Balarama Baladeva Balabhadra Halayudha',
+            'baladeva': 'Baladeva Balarama Balabhadra',
+            'krishna': 'Krishna Vasudeva Keshava Madhava Govinda',
+            'arjuna': 'Arjuna Partha Kiriti Dhananjaya',
+            'abhimanyu': 'Abhimanyu son of Arjuna Subhadra',
+            'draupadi': 'Draupadi Panchali Krishnaa Yajnaseni',
+            'yudhishthira': 'Yudhishthira Dharmaraja Ajatashatru',
+            'bhima': 'Bhima Bhimasena Vrikodara',
+        }
+
+        # Check for known names and expand
+        question_lower = question.lower()
+        for name, expansion in name_expansions.items():
+            if name in question_lower:
+                # Add all variations to improve retrieval
+                question = f"{question} {expansion}"
+                print(f"🔍 Query expansion: Added synonyms for '{name}' → {expansion}")
+                break  # Only expand first match to avoid query bloat
 
         # Detect G.O. number queries - HIGHEST PRIORITY
         # Handles: "G.O.Rt.No. 1447", "G O Rt No 1447", "GO RT NO 1447"
